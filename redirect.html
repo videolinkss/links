@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .redirect-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        .redirect-message {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+        .ad-placeholder {
+            background: #2d2d2d;
+            border: 2px dashed #555;
+            padding: 40px;
+            margin: 30px 0;
+            border-radius: 8px;
+            color: #888;
+            font-size: 18px;
+        }
+        .skip-button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 20px;
+        }
+        .skip-button:hover {
+            background: #357abd;
+        }
+        .countdown {
+            font-size: 18px;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-container">
+        <div class="redirect-message">Redirecting to video...</div>
+        
+        <!-- Phase 2: Ads will be inserted here -->
+        <div class="ad-placeholder">[ADS WILL BE SHOWN HERE]</div>
+        
+        <button class="skip-button" id="skipButton">Skip and Go Now</button>
+        <div class="countdown" id="countdown">Redirecting in <span id="timer">2</span> seconds...</div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('url');
+        const videoId = urlParams.get('id');
+
+        let countdown = 2;
+        let redirectTimer;
+
+        // Update countdown display
+        function updateCountdown() {
+            const timerElement = document.getElementById('timer');
+            if (timerElement) {
+                timerElement.textContent = countdown;
+            }
+        }
+
+        // Redirect function
+        function redirect() {
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                // Fallback: redirect to homepage if no URL provided
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Start countdown timer
+        function startCountdown() {
+            updateCountdown();
+            redirectTimer = setInterval(() => {
+                countdown--;
+                updateCountdown();
+                if (countdown <= 0) {
+                    clearInterval(redirectTimer);
+                    redirect();
+                }
+            }, 1000);
+        }
+
+        // Skip button handler
+        const skipButton = document.getElementById('skipButton');
+        if (skipButton) {
+            skipButton.addEventListener('click', () => {
+                clearInterval(redirectTimer);
+                redirect();
+            });
+        }
+
+        // Start countdown on page load
+        if (redirectUrl) {
+            startCountdown();
+        } else {
+            // If no URL provided, redirect to homepage after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Gallery - TeraBox</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header Banner Slider -->
+    <header class="header-banner">
+        <div class="banner-slider banner-slider-horizontal">
+            <div class="banner-slide active">
+                <div class="banner-placeholder">[Header Ad 1]</div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-placeholder">[Header Ad 2]</div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-placeholder">[Header Ad 3]</div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-placeholder">[Header Ad 4]</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Sidebar (Desktop Only) -->
+        <aside class="sidebar sidebar-left">
+            <div class="sidebar-slider sidebar-slider-vertical">
+                <div class="sidebar-slide active">
+                    <div class="sidebar-placeholder">[Left Ad 1]</div>
+                </div>
+                <div class="sidebar-slide">
+                    <div class="sidebar-placeholder">[Left Ad 2]</div>
+                </div>
+                <div class="sidebar-slide">
+                    <div class="sidebar-placeholder">[Left Ad 3]</div>
+                </div>
+                <div class="sidebar-slide">
+                    <div class="sidebar-placeholder">[Left Ad 4]</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <div class="gallery-container">
+                <div id="gallery-grid" class="gallery-grid">
+                    <!-- Thumbnails will be dynamically inserted here -->
+                </div>
+                <div id="loading-indicator" class="loading-indicator">
+                    <div class="spinner"></div>
+                    <p>Loading more videos...</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar (Desktop Only) -->
+        <aside class="sidebar sidebar-right">
+            <div class="sidebar-slider sidebar-slider-vertical">
+                <div class="sidebar-slide active">
+                    <div class="sidebar-placeholder">[Right Ad 1]</div>
+                </div>
+                <div class="sidebar-slide">
+                    <div class="sidebar-placeholder">[Right Ad 2]</div>
+                </div>
+                <div class="sidebar-slide">
+                    <div class="sidebar-placeholder">[Right Ad 3]</div>
+                </div>
+                <div class="sidebar-slide">
+                    <div class="sidebar-placeholder">[Right Ad 4]</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Footer Banner Slider -->
+    <footer class="footer-banner">
+        <div class="banner-slider banner-slider-horizontal">
+            <div class="banner-slide active">
+                <div class="banner-placeholder">[Footer Ad 1]</div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-placeholder">[Footer Ad 2]</div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-placeholder">[Footer Ad 3]</div>
+            </div>
+            <div class="banner-slide">
+                <div class="banner-placeholder">[Footer Ad 4]</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Popup Overlay Container -->
+    <div id="popup-overlay" class="popup-overlay hidden">
+        <div class="popup-content">
+            <div class="popup-ad-area" id="popup-ad-area">
+                <!-- Ad content will be inserted here -->
+                <p class="ad-placeholder">[AD CONTENT WILL BE SHOWN HERE]</p>
+            </div>
+            <button id="popup-close-btn" class="popup-close-btn hidden">×</button>
+        </div>
+    </div>
+
+    <!-- Final Redirect Overlay -->
+    <div id="redirect-overlay" class="redirect-overlay hidden">
+        <div class="redirect-content">
+            <h2>Loading Your Video...</h2>
+            <p class="redirect-message">Please wait or click below</p>
+            <button id="redirect-btn" class="redirect-btn">Click Here to Watch Video</button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
