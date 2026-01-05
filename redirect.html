@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+    <title>Visit Video - TeraBox</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
         .redirect-container {
             display: flex;
             flex-direction: column;
@@ -15,50 +20,69 @@
             padding: 20px;
             text-align: center;
         }
-        .redirect-message {
-            font-size: 24px;
-            margin-bottom: 30px;
-            color: #ffffff;
-        }
-        .ad-placeholder {
-            background: #2d2d2d;
-            border: 2px dashed #555;
+        .redirect-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
             padding: 40px;
-            margin: 30px 0;
-            border-radius: 8px;
-            color: #888;
-            font-size: 18px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-        .skip-button {
-            background: #4a90e2;
+        .redirect-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        .redirect-message {
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .visit-button {
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 6px;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s ease;
-            margin-top: 20px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            width: 100%;
+            max-width: 300px;
         }
-        .skip-button:hover {
-            background: #357abd;
+        .visit-button:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+        .visit-button:active {
+            transform: scale(0.98);
         }
         .countdown {
-            font-size: 18px;
-            color: #888;
+            font-size: 14px;
+            color: var(--text-muted);
             margin-top: 20px;
+        }
+        .video-id {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 15px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="redirect-container">
-        <div class="redirect-message">Redirecting to video...</div>
-        
-        <!-- Phase 2: Ads will be inserted here -->
-        <div class="ad-placeholder">[ADS WILL BE SHOWN HERE]</div>
-        
-        <button class="skip-button" id="skipButton">Skip and Go Now</button>
-        <div class="countdown" id="countdown">Redirecting in <span id="timer">2</span> seconds...</div>
+        <div class="redirect-card">
+            <h1 class="redirect-title">Ready to Watch</h1>
+            <p class="redirect-message">Click the button below to visit the video on TeraBox</p>
+            
+            <button class="visit-button" id="visitButton">Visit Video URL</button>
+            
+            <div class="countdown" id="countdown">Auto-redirecting in <span id="timer">3</span> seconds...</div>
+            <div class="video-id" id="videoId"></div>
+        </div>
     </div>
 
     <script>
@@ -67,8 +91,16 @@
         const redirectUrl = urlParams.get('url');
         const videoId = urlParams.get('id');
 
-        let countdown = 2;
+        let countdown = 3;
         let redirectTimer;
+
+        // Display video ID if available
+        if (videoId) {
+            const videoIdElement = document.getElementById('videoId');
+            if (videoIdElement) {
+                videoIdElement.textContent = `Video ID: ${videoId}`;
+            }
+        }
 
         // Update countdown display
         function updateCountdown() {
@@ -101,10 +133,10 @@
             }, 1000);
         }
 
-        // Skip button handler
-        const skipButton = document.getElementById('skipButton');
-        if (skipButton) {
-            skipButton.addEventListener('click', () => {
+        // Visit button handler
+        const visitButton = document.getElementById('visitButton');
+        if (visitButton) {
+            visitButton.addEventListener('click', () => {
                 clearInterval(redirectTimer);
                 redirect();
             });
@@ -114,10 +146,10 @@
         if (redirectUrl) {
             startCountdown();
         } else {
-            // If no URL provided, redirect to homepage after 2 seconds
+            // If no URL provided, redirect to homepage after 3 seconds
             setTimeout(() => {
                 window.location.href = 'index.html';
-            }, 2000);
+            }, 3000);
         }
     </script>
 </body>

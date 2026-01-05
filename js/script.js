@@ -6,7 +6,6 @@
 // Configuration
 const CONFIG = {
     itemsPerLoad: 50,
-    sliderInterval: 4000, // 4 seconds
     imagesPath: 'images/',
     dataPath: 'data/links.json',
     scrollThreshold: 300 // Load more when 300px from bottom
@@ -17,24 +16,83 @@ let allVideos = [];
 let currentIndex = 0;
 let isLoading = false;
 let scrollListenerAttached = false;
-
-// Popup System Variables
-let currentPopupStage = 0;
 let currentVideoUrl = '';
-let currentVideoId = '';
-const POPUP_DELAY = 5000; // 5 seconds before close button appears
-let popupCloseTimeout = null;
-let redirectTimeout = null;
+
+// Ad popup state (shown twice per click)
+let adPopupStage = 0;
+const MAX_AD_POPUP_STAGES = 2;
+let adPopupCountdown = 0;
+let adPopupIntervalId = null;
 
 /**
  * Initialize the application
  */
 function init() {
     console.log('🚀 Initializing application...');
-    initPopupSystem();
+    initVideoUrlModal();
+    initAdPopup();
     loadVideoData();
-    initBannerSliders();
-    initSidebarSliders();
+}
+
+/**
+ * Setup handlers for the video URL modal
+ */
+function initVideoUrlModal() {
+    const visitBtn = document.getElementById('video-url-visit-btn');
+    const closeBtn = document.getElementById('video-url-close-btn');
+    const modal = document.getElementById('video-url-modal');
+
+    if (visitBtn) {
+        visitBtn.addEventListener('click', () => {
+            if (currentVideoUrl) {
+                window.location.href = currentVideoUrl;
+            }
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            hideVideoUrlModal();
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideVideoUrlModal();
+            }
+        });
+    }
+}
+
+/**
+ * Initialize ad popup (2 stages with countdown)
+ */
+function initAdPopup() {
+    const closeBtn = document.getElementById('ad-popup-close-btn');
+    const overlay = document.getElementById('ad-popup-overlay');
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            if (!closeBtn.classList.contains('visible')) {
+                // Ignore clicks until countdown finished
+                return;
+            }
+            handleAdPopupClose();
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            // Don't allow clicking outside to close until countdown done
+            if (e.target === overlay) {
+                const btn = document.getElementById('ad-popup-close-btn');
+                if (btn && btn.classList.contains('visible')) {
+                    handleAdPopupClose();
+                }
+            }
+        });
+    }
 }
 
 /**
@@ -284,259 +342,185 @@ function createThumbnailElement(video) {
 }
 
 /**
- * Handle video thumbnail click - Start popup flow
+ * Handle video thumbnail click - Trigger popunder ads, then show popup when user returns
  * @param {Object} video - Video object with id and url
  */
 function navigateToVideo(video) {
     console.log('🎬 Video clicked:', video.id);
-    
-    // Store video info
+
+    // Reset any previous popups
+    hideVideoUrlModal();
+    resetAdPopupState();
+
+    // Store current video URL
     currentVideoUrl = video.url;
-    currentVideoId = video.id;
-    currentPopupStage = 0;
-    
-    // Show first popup
-    showPopup(1);
+
+    // Start first ad popup stage (will run twice before showing visit URL modal)
+    showNextAdPopupStage();
 }
 
 /**
- * Initialize Popup System
+ * Reset ad popup state and timers
  */
-function initPopupSystem() {
-    console.log('🎯 Initializing popup system...');
-    
-    const popupCloseBtn = document.getElementById('popup-close-btn');
-    const redirectBtn = document.getElementById('redirect-btn');
-    
-    if (!popupCloseBtn || !redirectBtn) {
-        console.error('❌ Popup elements not found in DOM');
+function resetAdPopupState() {
+    adPopupStage = 0;
+    adPopupCountdown = 0;
+    if (adPopupIntervalId) {
+        clearInterval(adPopupIntervalId);
+        adPopupIntervalId = null;
+    }
+
+    const overlay = document.getElementById('ad-popup-overlay');
+    const closeBtn = document.getElementById('ad-popup-close-btn');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+    if (closeBtn) {
+        closeBtn.classList.remove('visible');
+    }
+}
+
+/**
+ * Show the next ad popup stage (up to MAX_AD_POPUP_STAGES)
+ */
+function showNextAdPopupStage() {
+    const overlay = document.getElementById('ad-popup-overlay');
+    const timerSpan = document.getElementById('ad-popup-timer');
+    const closeBtn = document.getElementById('ad-popup-close-btn');
+
+    if (!overlay || !timerSpan || !closeBtn) return;
+
+    adPopupStage += 1;
+
+    // If we've already shown all stages, go directly to visit URL modal
+    if (adPopupStage > MAX_AD_POPUP_STAGES) {
+        showVideoUrlModal(currentVideoUrl);
         return;
     }
-    
-    // Close button click handler
-    popupCloseBtn.addEventListener('click', () => {
-        console.log('❌ Close button clicked');
-        closeCurrentPopup();
-    });
-    
-    // Redirect button click handler
-    redirectBtn.addEventListener('click', () => {
-        console.log('🚀 Redirect button clicked');
-        redirectToVideo();
-    });
-    
-    console.log('✅ Popup system initialized');
+
+    // Load correct skyscraper ad for this stage
+    loadAdForPopupStage(adPopupStage);
+
+    // Reset countdown and UI (15 seconds)
+    adPopupCountdown = 15;
+    timerSpan.textContent = String(adPopupCountdown);
+    closeBtn.classList.remove('visible');
+
+    overlay.classList.remove('hidden');
+
+    // Start countdown
+    if (adPopupIntervalId) {
+        clearInterval(adPopupIntervalId);
+    }
+    adPopupIntervalId = setInterval(() => {
+        adPopupCountdown -= 1;
+        if (adPopupCountdown <= 0) {
+            adPopupCountdown = 0;
+            timerSpan.textContent = '0';
+            clearInterval(adPopupIntervalId);
+            adPopupIntervalId = null;
+            // Enable close button
+            closeBtn.classList.add('visible');
+        } else {
+            timerSpan.textContent = String(adPopupCountdown);
+        }
+    }, 1000);
 }
 
 /**
- * Show Popup with Stage Number
- * @param {number} stage - Popup stage (1, 2, or 3)
+ * Handle closing of current ad popup stage
  */
-function showPopup(stage) {
-    console.log(`📢 Showing popup stage ${stage}`);
-    
-    const popupOverlay = document.getElementById('popup-overlay');
-    const popupCloseBtn = document.getElementById('popup-close-btn');
-    const popupAdArea = document.getElementById('popup-ad-area');
-    
-    if (!popupOverlay || !popupCloseBtn || !popupAdArea) {
-        console.error('❌ Popup elements not found');
-        return;
-    }
-    
-    // Update ad content
-    popupAdArea.innerHTML = `<p class="ad-placeholder">[AD CONTENT ${stage}]</p>`;
-    
-    // Show overlay
-    popupOverlay.classList.remove('hidden');
-    
-    // Hide close button initially
-    popupCloseBtn.classList.add('hidden');
-    
-    // Clear any existing timeout
-    if (popupCloseTimeout) {
-        clearTimeout(popupCloseTimeout);
-    }
-    
-    // Show close button after 5 seconds
-    popupCloseTimeout = setTimeout(() => {
-        console.log(`⏰ Close button now visible for popup ${stage}`);
-        popupCloseBtn.classList.remove('hidden');
-    }, POPUP_DELAY);
-    
-    currentPopupStage = stage;
-}
+function handleAdPopupClose() {
+    const overlay = document.getElementById('ad-popup-overlay');
 
-/**
- * Close Current Popup and Move to Next Stage
- */
-function closeCurrentPopup() {
-    console.log(`🔒 Closing popup stage ${currentPopupStage}`);
-    
-    const popupOverlay = document.getElementById('popup-overlay');
-    
-    if (!popupOverlay) return;
-    
-    // Clear timeout if close button was scheduled to appear
-    if (popupCloseTimeout) {
-        clearTimeout(popupCloseTimeout);
-        popupCloseTimeout = null;
+    if (overlay) {
+        overlay.classList.add('hidden');
     }
-    
-    // Hide current popup
-    popupOverlay.classList.add('hidden');
-    
-    // Move to next stage
-    if (currentPopupStage < 3) {
-        // Show next popup after short delay
-        setTimeout(() => {
-            showPopup(currentPopupStage + 1);
-        }, 300);
+
+    if (adPopupIntervalId) {
+        clearInterval(adPopupIntervalId);
+        adPopupIntervalId = null;
+    }
+
+    // If there are more stages, show the next one; otherwise show visit URL modal
+    if (adPopupStage < MAX_AD_POPUP_STAGES) {
+        showNextAdPopupStage();
     } else {
-        // All popups done, show redirect page
-        console.log('✅ All popups completed, showing redirect page');
-        setTimeout(() => {
-            showRedirectPage();
-        }, 300);
+        showVideoUrlModal(currentVideoUrl);
     }
 }
 
 /**
- * Show Final Redirect Page
+ * Inject the correct skyscraper ad into the popup for the current stage
+ * Stage 1: left skyscraper key (600x160)
+ * Stage 2: right/footer skyscraper key (300x160)
  */
-function showRedirectPage() {
-    console.log('📄 Showing redirect page');
-    
-    const redirectOverlay = document.getElementById('redirect-overlay');
-    
-    if (!redirectOverlay) {
-        console.error('❌ Redirect overlay not found');
-        return;
-    }
-    
-    // Show redirect overlay
-    redirectOverlay.classList.remove('hidden');
-    
-    // Clear any existing timeout
-    if (redirectTimeout) {
-        clearTimeout(redirectTimeout);
-    }
-    
-    // Auto redirect after 2 seconds
-    redirectTimeout = setTimeout(() => {
-        console.log('⏰ Auto-redirecting after 2 seconds');
-        redirectToVideo();
-    }, 2000);
-}
+function loadAdForPopupStage(stage) {
+    const slot = document.getElementById('ad-popup-slot');
+    if (!slot) return;
 
-/**
- * Redirect to Actual Video URL
- */
-function redirectToVideo() {
-    console.log('🌐 Redirecting to video:', currentVideoUrl);
-    
-    // Clear any pending timeouts
-    if (redirectTimeout) {
-        clearTimeout(redirectTimeout);
-        redirectTimeout = null;
-    }
-    
-    if (currentVideoUrl) {
-        window.location.href = currentVideoUrl;
+    // Clear previous ad content
+    slot.innerHTML = '';
+
+    let key, height, width;
+    if (stage === 1) {
+        key = 'c4ecf77578eb642f74a23e2a6f050b51'; // left skyscraper
+        height = 600;
+        width = 160;
     } else {
-        console.error('❌ No video URL to redirect to');
-    }
-}
-
-/**
- * Initialize header and footer banner sliders (horizontal)
- */
-function initBannerSliders() {
-    // Header slider: LEFT → RIGHT
-    initHorizontalSlider('.header-banner .banner-slider-horizontal', CONFIG.sliderInterval, 'left-to-right');
-    
-    // Footer slider: RIGHT → LEFT
-    initHorizontalSlider('.footer-banner .banner-slider-horizontal', CONFIG.sliderInterval, 'right-to-left');
-}
-
-/**
- * Initialize horizontal slider (header/footer)
- * @param {string} selector - CSS selector for the slider container
- * @param {number} interval - Rotation interval in milliseconds
- * @param {string} direction - 'left-to-right' or 'right-to-left'
- */
-function initHorizontalSlider(selector, interval, direction) {
-    const slider = document.querySelector(selector);
-    if (!slider) return;
-
-    const slides = slider.querySelectorAll('.banner-slide');
-    if (slides.length === 0) return;
-
-    let currentSlide = 0;
-
-    function rotateSlides() {
-        // Mark current slide as previous
-        slides[currentSlide].classList.remove('active');
-        slides[currentSlide].classList.add('prev');
-        
-        // Move to next slide
-        currentSlide = (currentSlide + 1) % slides.length;
-        
-        // Remove prev class from all slides
-        slides.forEach(slide => slide.classList.remove('prev'));
-        
-        // Add active class to new slide
-        slides[currentSlide].classList.add('active');
+        key = '80452d4c78311386b34467a0adc50169'; // right/footer skyscraper
+        height = 300;
+        width = 160;
     }
 
-    // Start rotation
-    setInterval(rotateSlides, interval);
+    // Setup atOptions for this placement
+    const setupScript = document.createElement('script');
+    setupScript.type = 'text/javascript';
+    setupScript.innerHTML = `
+        atOptions = {
+            key: '${key}',
+            format: 'iframe',
+            height: ${height},
+            width: ${width},
+            params: {}
+        };
+    `;
+
+    // Invoke script
+    const invokeScript = document.createElement('script');
+    invokeScript.type = 'text/javascript';
+    invokeScript.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
+
+    slot.appendChild(setupScript);
+    slot.appendChild(invokeScript);
 }
 
 /**
- * Initialize sidebar sliders (vertical)
+ * Show the video URL modal
+ * @param {string} url
  */
-function initSidebarSliders() {
-    // Left sidebar: TOP → BOTTOM
-    initVerticalSlider('.sidebar-left .sidebar-slider', CONFIG.sliderInterval, 'top-to-bottom');
-    
-    // Right sidebar: BOTTOM → TOP
-    initVerticalSlider('.sidebar-right .sidebar-slider', CONFIG.sliderInterval, 'bottom-to-top');
-}
+function showVideoUrlModal(url) {
+    const modal = document.getElementById('video-url-modal');
+    const urlText = document.getElementById('video-url-text');
 
-/**
- * Initialize vertical slider (sidebars)
- * @param {string} selector - CSS selector for the slider container
- * @param {number} interval - Rotation interval in milliseconds
- * @param {string} direction - 'top-to-bottom' or 'bottom-to-top'
- */
-function initVerticalSlider(selector, interval, direction) {
-    const slider = document.querySelector(selector);
-    if (!slider) return;
+    if (!modal) return;
 
-    const slides = slider.querySelectorAll('.sidebar-slide');
-    if (slides.length === 0) return;
-
-    let currentSlide = 0;
-
-    function rotateSlides() {
-        // Mark current slide as previous
-        slides[currentSlide].classList.remove('active');
-        slides[currentSlide].classList.add('prev');
-        
-        // Move to next slide
-        currentSlide = (currentSlide + 1) % slides.length;
-        
-        // Remove prev class from all slides
-        slides.forEach(slide => slide.classList.remove('prev'));
-        
-        // Add active class to new slide
-        slides[currentSlide].classList.add('active');
+    if (urlText) {
+        urlText.textContent = url || '';
     }
 
-    // Start rotation
-    setInterval(rotateSlides, interval);
+    modal.classList.remove('hidden');
 }
+
+/**
+ * Hide the video URL modal
+ */
+function hideVideoUrlModal() {
+    const modal = document.getElementById('video-url-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+}
+
 
 /**
  * Show error message to user

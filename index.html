@@ -7,40 +7,26 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Header Banner Slider -->
+    <!-- Header Area - Native/Social Banner Ad -->
     <header class="header-banner">
-        <div class="banner-slider banner-slider-horizontal">
-            <div class="banner-slide active">
-                <div class="banner-placeholder">[Header Ad 1]</div>
-            </div>
-            <div class="banner-slide">
-                <div class="banner-placeholder">[Header Ad 2]</div>
-            </div>
-            <div class="banner-slide">
-                <div class="banner-placeholder">[Header Ad 3]</div>
-            </div>
-            <div class="banner-slide">
-                <div class="banner-placeholder">[Header Ad 4]</div>
-            </div>
-        </div>
+        <script async="async" data-cfasync="false" src="https://pl28400993.effectivegatecpm.com/d2fa428abe351bbce571e848e4166e8d/invoke.js"></script>
+        <div id="container-d2fa428abe351bbce571e848e4166e8d"></div>
     </header>
 
     <div class="main-container">
-        <!-- Left Sidebar (Desktop Only) -->
+        <!-- Left Sidebar - Skyscraper Banner (600x160) -->
         <aside class="sidebar sidebar-left">
-            <div class="sidebar-slider sidebar-slider-vertical">
-                <div class="sidebar-slide active">
-                    <div class="sidebar-placeholder">[Left Ad 1]</div>
-                </div>
-                <div class="sidebar-slide">
-                    <div class="sidebar-placeholder">[Left Ad 2]</div>
-                </div>
-                <div class="sidebar-slide">
-                    <div class="sidebar-placeholder">[Left Ad 3]</div>
-                </div>
-                <div class="sidebar-slide">
-                    <div class="sidebar-placeholder">[Left Ad 4]</div>
-                </div>
+            <div class="ad-container">
+                <script>
+                    atOptions = {
+                        'key' : 'c4ecf77578eb642f74a23e2a6f050b51',
+                        'format' : 'iframe',
+                        'height' : 600,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://www.highperformanceformat.com/c4ecf77578eb642f74a23e2a6f050b51/invoke.js"></script>
             </div>
         </aside>
 
@@ -57,62 +43,67 @@
             </div>
         </main>
 
-        <!-- Right Sidebar (Desktop Only) -->
+        <!-- Right Sidebar - Skyscraper Banner (300x160) -->
         <aside class="sidebar sidebar-right">
-            <div class="sidebar-slider sidebar-slider-vertical">
-                <div class="sidebar-slide active">
-                    <div class="sidebar-placeholder">[Right Ad 1]</div>
-                </div>
-                <div class="sidebar-slide">
-                    <div class="sidebar-placeholder">[Right Ad 2]</div>
-                </div>
-                <div class="sidebar-slide">
-                    <div class="sidebar-placeholder">[Right Ad 3]</div>
-                </div>
-                <div class="sidebar-slide">
-                    <div class="sidebar-placeholder">[Right Ad 4]</div>
-                </div>
+            <div class="ad-container">
+                <script>
+                    atOptions = {
+                        'key' : '80452d4c78311386b34467a0adc50169',
+                        'format' : 'iframe',
+                        'height' : 300,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script src="https://www.highperformanceformat.com/80452d4c78311386b34467a0adc50169/invoke.js"></script>
             </div>
         </aside>
     </div>
 
-    <!-- Footer Banner Slider -->
-    <footer class="footer-banner">
-        <div class="banner-slider banner-slider-horizontal">
-            <div class="banner-slide active">
-                <div class="banner-placeholder">[Footer Ad 1]</div>
+    <!-- Ad popup (shown twice per video click with 5s countdown) -->
+    <div id="ad-popup-overlay" class="ad-popup-overlay hidden">
+        <div class="ad-popup-content">
+            <div class="ad-popup-ad-slot" id="ad-popup-slot">
+                <!-- Ad for current stage will be injected here -->
             </div>
-            <div class="banner-slide">
-                <div class="banner-placeholder">[Footer Ad 2]</div>
+            <div class="ad-popup-timer-badge">
+                <span id="ad-popup-timer">15</span>s
             </div>
-            <div class="banner-slide">
-                <div class="banner-placeholder">[Footer Ad 3]</div>
-            </div>
-            <div class="banner-slide">
-                <div class="banner-placeholder">[Footer Ad 4]</div>
-            </div>
+            <button id="ad-popup-close-btn" class="ad-popup-close-btn">
+                ×
+            </button>
         </div>
+    </div>
+
+    <!-- Simple popup to show the actual video URL and confirm visiting in current page -->
+    <div id="video-url-modal" class="video-url-modal hidden">
+        <div class="video-url-modal-content">
+            <h2 class="video-url-title">Ready to Watch</h2>
+            <p class="video-url-message">Click below to open this video URL in this page.</p>
+            <p id="video-url-text" class="video-url-text"></p>
+            <button id="video-url-visit-btn" class="video-url-visit-btn">Visit URL in this page</button>
+            <button id="video-url-close-btn" class="video-url-close-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- Footer Area -->
+    <footer class="footer-banner">
+        <!-- Additional footer banner (skyscraper unit reused) -->
+        <script>
+            atOptions = {
+                'key' : '80452d4c78311386b34467a0adc50169',
+                'format' : 'iframe',
+                'height' : 300,
+                'width' : 160,
+                'params' : {}
+            };
+        </script>
+        <script src="https://www.highperformanceformat.com/80452d4c78311386b34467a0adc50169/invoke.js"></script>
     </footer>
 
-    <!-- Popup Overlay Container -->
-    <div id="popup-overlay" class="popup-overlay hidden">
-        <div class="popup-content">
-            <div class="popup-ad-area" id="popup-ad-area">
-                <!-- Ad content will be inserted here -->
-                <p class="ad-placeholder">[AD CONTENT WILL BE SHOWN HERE]</p>
-            </div>
-            <button id="popup-close-btn" class="popup-close-btn hidden">×</button>
-        </div>
-    </div>
-
-    <!-- Final Redirect Overlay -->
-    <div id="redirect-overlay" class="redirect-overlay hidden">
-        <div class="redirect-content">
-            <h2>Loading Your Video...</h2>
-            <p class="redirect-message">Please wait or click below</p>
-            <button id="redirect-btn" class="redirect-btn">Click Here to Watch Video</button>
-        </div>
-    </div>
+    <!-- Popunder scripts (loaded once on the homepage) -->
+    <script src="https://pl28400957.effectivegatecpm.com/a5/3a/04/a53a04830edc924275e1959d962ab7da.js"></script>
+    <script src="https://pl28400976.effectivegatecpm.com/b1/a5/5b/b1a55b6c433993ed2e5cb29e9bb0ffbe.js"></script>
 
     <script src="js/script.js"></script>
 </body>
