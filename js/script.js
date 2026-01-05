@@ -18,9 +18,9 @@ let isLoading = false;
 let scrollListenerAttached = false;
 let currentVideoUrl = '';
 
-// Ad popup state (shown twice per click)
+// Ad popup state (single popup per click)
 let adPopupStage = 0;
-const MAX_AD_POPUP_STAGES = 2;
+const MAX_AD_POPUP_STAGES = 1;
 let adPopupCountdown = 0;
 let adPopupIntervalId = null;
 
@@ -401,8 +401,8 @@ function showNextAdPopupStage() {
     // Load correct skyscraper ad for this stage
     loadAdForPopupStage(adPopupStage);
 
-    // Reset countdown and UI (15 seconds)
-    adPopupCountdown = 15;
+    // Reset countdown and UI (5 seconds)
+    adPopupCountdown = 5;
     timerSpan.textContent = String(adPopupCountdown);
     closeBtn.classList.remove('visible');
 
